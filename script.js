@@ -378,6 +378,7 @@ if (preferredDateInput) {
             lpTag.agentSDK.command(cmdName, data, notifyWhenDone);
         }
 	    
+// Send Add to Calendar Button
 document.getElementById('sendAddToCalendarButton').addEventListener('click', function () {
     const eventLocation = document.getElementById('eventLocation').value.trim();
     const startDate = document.getElementById('startDate').value;
@@ -392,26 +393,37 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     const endDate = calculateEndTime(startDate, duration);
 
     // Format the dates for the calendar links
-    const formattedStartDate = formatDateForICS(startDate);
-    const formattedEndDate = formatDateForICS(endDate);
+    const formattedStartDate = formatDateForCalendar(startDate);
+    const formattedEndDate = formatDateForCalendar(endDate);
 
-	console.log("formattedStartDate= "+formattedStartDate);
-        console.log("formattedStartDate= "+formattedEndDate);
     // Google Calendar URL
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
 
     // Apple Calendar (.ics) URL encoded
-    const appleCalendarUrl = `data:text/calendar;charset=utf8,` + encodeURIComponent(`
+    const appleCalendarUrl = `data:text/calendar;charset=utf-8,` + encodeURIComponent(`
 BEGIN:VCALENDAR
 VERSION:2.0
+PRODID:-//Your Organization//Your Product//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-PRODID:-//Your Organization//Your Product//EN
 BEGIN:VEVENT
 SUMMARY:Health Care Appointment
 LOCATION:${eventLocation}
-DTSTART;TZID=CST:${formattedStartDate}
-DTEND;TZID=CST:${formattedEndDate}
+DTSTART:${formatDateForICS(startDate)}
+DTEND:${formatDateForICS(endDate)}
+BEGIN:VTIMEZONE
+TZID:America/Chicago
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0500
+DTSTART:20220313T020000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+DTSTART:20211107T020000
+END:STANDARD
+END:VTIMEZONE
 END:VEVENT
 END:VCALENDAR
     `.trim());
@@ -460,16 +472,20 @@ END:VCALENDAR
     lpTag.agentSDK.command(cmdName, data, notifyWhenDone);
 });
 
-// Helper function to format dates for ICS files
-function formatDateForICS(dateStr) {
-    const date = new Date(dateStr);
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Ensure proper format with Z for UTC
-}
-
 // Helper function to format dates for calendar links
 function formatDateForCalendar(dateStr) {
     const date = new Date(dateStr);
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0]; // Remove the Z for Google Calendar links
+    // Ensure the date is in the CST timezone
+    date.setHours(date.getHours() - 6); // Adjust for GMT-6
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Format as YYYYMMDDTHHMMSSZ
+}
+
+// Helper function to format dates for ICS files
+function formatDateForICS(dateStr) {
+    const date = new Date(dateStr);
+    // Ensure the date is in the CST timezone
+    date.setHours(date.getHours() - 6); // Adjust for GMT-6
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Format as YYYYMMDDTHHMMSSZ
 }
 
 // Helper function to calculate end time based on duration (in minutes)
@@ -478,5 +494,6 @@ function calculateEndTime(startDateStr, duration) {
     startDate.setMinutes(startDate.getMinutes() + duration);
     return startDate;
 }
+
  
 }
