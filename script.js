@@ -378,7 +378,6 @@ if (preferredDateInput) {
             lpTag.agentSDK.command(cmdName, data, notifyWhenDone);
         }
 	    
-// Send Add to Calendar
 document.getElementById('sendAddToCalendarButton').addEventListener('click', function () {
     const eventLocation = document.getElementById('eventLocation').value.trim();
     const startDate = document.getElementById('startDate').value;
@@ -393,34 +392,29 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     const endDate = calculateEndTime(startDate, duration);
 
     // Format the dates for the calendar links
-    const formattedStartDate = formatDateForCalendar(startDate);
-    const formattedEndDate = formatDateForCalendar(endDate);
+    const formattedStartDate = formatDateForICS(startDate);
+    const formattedEndDate = formatDateForICS(endDate);
 
     // Google Calendar URL
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
 
     // Apple Calendar (.ics) URL encoded
-    const icsContent = `
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    BEGIN:VEVENT
-    SUMMARY:Health Care Appointment
-    LOCATION:${eventLocation}
-    DTSTART:${formattedStartDate}
-    DTEND:${formattedEndDate}
-    END:VEVENT
-    END:VCALENDAR
-        `.trim();
-    
-        // Encode the ICS content to create a data URI
-        const encodedUri = encodeURI('data:text/calendar;charset=utf-8,' + icsContent);
-        console.log("EncodedURL=" + encodedUri);
+    const appleCalendarUrl = `data:text/calendar;charset=utf8,` + encodeURIComponent(`
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+PRODID:-//Your Organization//Your Product//EN
+BEGIN:VEVENT
+SUMMARY:Health Care Appointment
+LOCATION:${eventLocation}
+DTSTART;TZID=CST:${formattedStartDate}
+DTEND;TZID=CST:${formattedEndDate}
+END:VEVENT
+END:VCALENDAR
+    `.trim());
 
-    // Outlook Calendar URL
-    const outlookCalendarUrl = `https://outlook.live.com/owa/?path=/calendar/action/compose&subject=Health+Care+Appointment&startdt=${formattedStartDate}&enddt=${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
-
-    console.log("outlookCalendarUrl= "+outlookCalendarUrl);
-    // Send structured content with three buttons (Google, Apple, and Outlook Calendar)
+    // Send structured content with two buttons (Google and Apple Calendar)
     var notifyWhenDone = function (err) {
         if (err) {
             console.error('Error sending Add to Calendar:', err);
@@ -453,11 +447,10 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
                     "click": {
                         "actions": [{
                             "type": "link",
-                            "uri": encodedUri
+                            "uri": appleCalendarUrl
                         }]
                     }
                 }
-                
             ]
         }
     };
@@ -465,20 +458,23 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     lpTag.agentSDK.command(cmdName, data, notifyWhenDone);
 });
 
+// Helper function to format dates for ICS files
+function formatDateForICS(dateStr) {
+    const date = new Date(dateStr);
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Ensure proper format with Z for UTC
+}
+
 // Helper function to format dates for calendar links
 function formatDateForCalendar(dateStr) {
     const date = new Date(dateStr);
-    // Convert to UTC and ensure the same timezone is used
-    const utcDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000)); // Convert to UTC
-    return utcDate.toISOString().replace(/[-:]/g, '').split('.')[0];
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0]; // Remove the Z for Google Calendar links
 }
 
-// Update calculateEndTime to handle timezone if necessary
+// Helper function to calculate end time based on duration (in minutes)
 function calculateEndTime(startDateStr, duration) {
     const startDate = new Date(startDateStr);
     startDate.setMinutes(startDate.getMinutes() + duration);
-    // Optionally convert end date to UTC or desired timezone
-    const utcEndDate = new Date(startDate.getTime() + (startDate.getTimezoneOffset() * 60000));
-    return utcEndDate;
-}  
+    return startDate;
+}
+ 
 }
