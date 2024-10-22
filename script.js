@@ -377,9 +377,7 @@ if (preferredDateInput) {
         };
             lpTag.agentSDK.command(cmdName, data, notifyWhenDone);
         }
-
 	    
-// Send Add to Calendar
 // Send Add to Calendar
 document.getElementById('sendAddToCalendarButton').addEventListener('click', function () {
     const eventLocation = document.getElementById('eventLocation').value.trim();
@@ -401,23 +399,27 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     // Google Calendar URL
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
 
-    // Apple Calendar (.ics) URL
-    const appleCalendarContent = `
-BEGIN:VCALENDAR
-VERSION:2.0
-BEGIN:VEVENT
-SUMMARY:Health Care Appointment
-LOCATION:${eventLocation}
-DTSTART:${formattedStartDate}
-DTEND:${formattedEndDate}
-END:VEVENT
-END:VCALENDAR
-    `.trim();
-    const appleCalendarUrl = `data:text/calendar;charset=utf8,${encodeURIComponent(appleCalendarContent)}`;
+    // Apple Calendar (.ics) URL encoded
+    const icsContent = `
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    SUMMARY:Health Care Appointment
+    LOCATION:${eventLocation}
+    DTSTART:${formattedStartDate}
+    DTEND:${formattedEndDate}
+    END:VEVENT
+    END:VCALENDAR
+        `.trim();
+    
+        // Encode the ICS content to create a data URI
+        const encodedUri = encodeURI('data:text/calendar;charset=utf-8,' + icsContent);
+        console.log("EncodedURL=" + encodedUri);
 
     // Outlook Calendar URL
     const outlookCalendarUrl = `https://outlook.live.com/owa/?path=/calendar/action/compose&subject=Health+Care+Appointment&startdt=${formattedStartDate}&enddt=${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
 
+    console.log("outlookCalendarUrl= "+outlookCalendarUrl);
     // Send structured content with three buttons (Google, Apple, and Outlook Calendar)
     var notifyWhenDone = function (err) {
         if (err) {
@@ -451,10 +453,11 @@ END:VCALENDAR
                     "click": {
                         "actions": [{
                             "type": "link",
-                            "uri": appleCalendarUrl
+                            "uri": encodedUri
                         }]
                     }
                 }
+                
             ]
         }
     };
@@ -465,25 +468,17 @@ END:VCALENDAR
 // Helper function to format dates for calendar links
 function formatDateForCalendar(dateStr) {
     const date = new Date(dateStr);
-
-    // Convert the date to CST
-    const cstDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-
-    // Format the date in the required format
-    return cstDate.toISOString().replace(/[-:]/g, '').split('.')[0];
+    // Convert to UTC and ensure the same timezone is used
+    const utcDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000)); // Convert to UTC
+    return utcDate.toISOString().replace(/[-:]/g, '').split('.')[0];
 }
 
-// Helper function to calculate end time based on duration (in minutes)
+// Update calculateEndTime to handle timezone if necessary
 function calculateEndTime(startDateStr, duration) {
     const startDate = new Date(startDateStr);
-
-    // Convert to CST before adding duration
-    const cstStartDate = new Date(startDate.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-
-    // Add duration in minutes
-    cstStartDate.setMinutes(cstStartDate.getMinutes() + duration);
-
-    // Return the adjusted end time in CST
-    return cstStartDate;
-}   
+    startDate.setMinutes(startDate.getMinutes() + duration);
+    // Optionally convert end date to UTC or desired timezone
+    const utcEndDate = new Date(startDate.getTime() + (startDate.getTimezoneOffset() * 60000));
+    return utcEndDate;
+}  
 }
