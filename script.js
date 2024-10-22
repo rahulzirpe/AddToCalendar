@@ -395,6 +395,8 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     const formattedStartDate = formatDateForICS(startDate);
     const formattedEndDate = formatDateForICS(endDate);
 
+	console.log("formattedStartDate= "+formattedStartDate);
+        console.log("formattedStartDate= "+formattedEndDate);
     // Google Calendar URL
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
 
