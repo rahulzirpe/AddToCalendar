@@ -380,6 +380,7 @@ if (preferredDateInput) {
 
 	    
 // Send Add to Calendar
+// Send Add to Calendar
 document.getElementById('sendAddToCalendarButton').addEventListener('click', function () {
     const eventLocation = document.getElementById('eventLocation').value.trim();
     const startDate = document.getElementById('startDate').value;
@@ -452,17 +453,8 @@ END:VCALENDAR
                             "uri": appleCalendarUrl
                         }]
                     }
-                },
-                {
-                    "type": "button",
-                    "title": "Add to Outlook Calendar",
-                    "click": {
-                        "actions": [{
-                            "type": "link",
-                            "uri": outlookCalendarUrl
-                        }]
-                    }
                 }
+                
             ]
         }
     };
@@ -473,15 +465,28 @@ END:VCALENDAR
 // Helper function to format dates for calendar links
 function formatDateForCalendar(dateStr) {
     const date = new Date(dateStr);
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0];
+
+    // Convert the date to CST
+    const cstDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+
+    // Format the date in the required format
+    return cstDate.toISOString().replace(/[-:]/g, '').split('.')[0];
 }
 
 // Helper function to calculate end time based on duration (in minutes)
 function calculateEndTime(startDateStr, duration) {
     const startDate = new Date(startDateStr);
-    startDate.setMinutes(startDate.getMinutes() + duration);
-    return startDate;
+
+    // Convert to CST before adding duration
+    const cstStartDate = new Date(startDate.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+
+    // Add duration in minutes
+    cstStartDate.setMinutes(cstStartDate.getMinutes() + duration);
+
+    // Return the adjusted end time in CST
+    return cstStartDate;
 }
+
 
     
 }
