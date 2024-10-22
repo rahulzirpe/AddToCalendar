@@ -401,8 +401,8 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     // Google Calendar URL
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
 
-    // Apple Calendar (.ics) URL encoded
-    const appleCalendarUrl = `data:text/calendar;charset=utf8,` + encodeURIComponent(`
+    // Apple Calendar (.ics) URL
+    const appleCalendarContent = `
 BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
@@ -412,7 +412,8 @@ DTSTART:${formattedStartDate}
 DTEND:${formattedEndDate}
 END:VEVENT
 END:VCALENDAR
-    `.trim());
+    `.trim();
+    const appleCalendarUrl = `data:text/calendar;charset=utf8,${encodeURIComponent(appleCalendarContent)}`;
 
     // Outlook Calendar URL
     const outlookCalendarUrl = `https://outlook.live.com/owa/?path=/calendar/action/compose&subject=Health+Care+Appointment&startdt=${formattedStartDate}&enddt=${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
@@ -454,7 +455,6 @@ END:VCALENDAR
                         }]
                     }
                 }
-                
             ]
         }
     };
@@ -485,8 +485,5 @@ function calculateEndTime(startDateStr, duration) {
 
     // Return the adjusted end time in CST
     return cstStartDate;
-}
-
-
-    
+}   
 }
