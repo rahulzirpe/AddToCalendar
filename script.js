@@ -393,16 +393,45 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     const endDate = calculateEndTime(startDate, duration);
 
     // Format the dates for the calendar links
-    const formattedStartDate = formatDateForGoogle(startDate);
-    const formattedEndDate = formatDateForGoogle(endDate);
+    const formattedStartDate = formatDateForGoogleCalendar(startDate);
+    const formattedEndDate = formatDateForGoogleCalendar(endDate);
 
     const formatStartDate = formatReadableDate(startDate);
     const formatEndDate = formatReadableDate(endDate);
 
-    // Google Calendar URL (No time zone adjustment, use local time)
+    // Google Calendar URL (Use the correctly formatted local time)
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
     
     console.log("googleCalendarUrl= " + googleCalendarUrl);
+
+	// Apple Calendar (.ics) URL encoded
+    const appleCalendarUrl = `data:text/calendar;charset=utf-8,` + encodeURIComponent(`
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Your Organization//Your Product//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+SUMMARY:Health Care Appointment
+LOCATION:${eventLocation}
+DTSTART:${formatDateForICS(startDate)}
+DTEND:${formatDateForICS(endDate)}
+BEGIN:VTIMEZONE
+TZID:America/Chicago
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0500
+DTSTART:20220313T020000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+DTSTART:20211107T020000
+END:STANDARD
+END:VTIMEZONE
+END:VEVENT
+END:VCALENDAR
+    `.trim());
 
     // Send structured content with two buttons (Google and Apple Calendar)
     var notifyWhenDone = function (err) {
@@ -448,11 +477,19 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     lpTag.agentSDK.command(cmdName, data, notifyWhenDone);
 });
 
-// Helper function to format dates for Google Calendar (local time format, no 'Z' for UTC)
-function formatDateForGoogle(dateStr) {
+// Helper function to format dates for Google Calendar (local time format)
+function formatDateForGoogleCalendar(dateStr) {
     const date = new Date(dateStr);
-    // Format as YYYYMMDDTHHMMSS (without Z at the end)
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0];
+
+    // Get the local time values (no conversion to UTC)
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    // Return the formatted date string for Google Calendar (YYYYMMDDTHHMMSS)
+    return `${year}${month}${day}T${hours}${minutes}00`;
 }
 
 // Helper function to calculate end time based on duration (in minutes)
@@ -495,6 +532,7 @@ function formatReadableDate(dateStr) {
     // Format the date as "Tue Oct 29 09:00 am"
     return `${dayOfWeek} ${month} ${day} ${hours}:${minutes} ${ampm}`;
 }
+
 
 
 }
