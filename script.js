@@ -399,6 +399,9 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
 	console.log("formattedStartDate"+formattedStartDate);
 	console.log("formattedEndDate"+formattedEndDate);
 
+   const formatStartDate=formatReadableDate(startDate);
+   const formatEndDate=formatReadableDate(endDate);
+
     // Google Calendar URL
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
 
@@ -446,7 +449,7 @@ END:VCALENDAR
             "elements": [
                 {
                     "type": "text",
-                    "text": "Click the buttons below to add the appointment to your calendar."
+                    "text": `Your appointment is confirmed on ${formatStartDate} to ${formatEndDate}.`
                 },
                 {
                     "type": "button",
