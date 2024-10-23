@@ -404,7 +404,7 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
 
     // Google Calendar URL
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
-
+    console.log("googleCalendarUrl= "+googleCalendarUrl);
     // Apple Calendar (.ics) URL encoded
     const appleCalendarUrl = `data:text/calendar;charset=utf-8,` + encodeURIComponent(`
 BEGIN:VCALENDAR
