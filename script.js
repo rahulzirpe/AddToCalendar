@@ -393,46 +393,16 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     const endDate = calculateEndTime(startDate, duration);
 
     // Format the dates for the calendar links
-    const formattedStartDate = formatDateForCalendar(startDate);
-    const formattedEndDate = formatDateForCalendar(endDate);
+    const formattedStartDate = formatDateForGoogle(startDate);
+    const formattedEndDate = formatDateForGoogle(endDate);
 
-	console.log("formattedStartDate"+formattedStartDate);
-	console.log("formattedEndDate"+formattedEndDate);
+    const formatStartDate = formatReadableDate(startDate);
+    const formatEndDate = formatReadableDate(endDate);
 
-   const formatStartDate=formatReadableDate(startDate);
-   const formatEndDate=formatReadableDate(endDate);
-
-    // Google Calendar URL
+    // Google Calendar URL (No time zone adjustment, let Google handle it)
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
-    console.log("googleCalendarUrl= "+googleCalendarUrl);
-    // Apple Calendar (.ics) URL encoded
-    const appleCalendarUrl = `data:text/calendar;charset=utf-8,` + encodeURIComponent(`
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Your Organization//Your Product//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-BEGIN:VEVENT
-SUMMARY:Health Care Appointment
-LOCATION:${eventLocation}
-DTSTART:${formatDateForICS(startDate)}
-DTEND:${formatDateForICS(endDate)}
-BEGIN:VTIMEZONE
-TZID:America/Chicago
-BEGIN:DAYLIGHT
-TZOFFSETFROM:-0600
-TZOFFSETTO:-0500
-DTSTART:20220313T020000
-END:DAYLIGHT
-BEGIN:STANDARD
-TZOFFSETFROM:-0500
-TZOFFSETTO:-0600
-DTSTART:20211107T020000
-END:STANDARD
-END:VTIMEZONE
-END:VEVENT
-END:VCALENDAR
-    `.trim());
+    
+    console.log("googleCalendarUrl= " + googleCalendarUrl);
 
     // Send structured content with two buttons (Google and Apple Calendar)
     var notifyWhenDone = function (err) {
@@ -478,20 +448,10 @@ END:VCALENDAR
     lpTag.agentSDK.command(cmdName, data, notifyWhenDone);
 });
 
-// Helper function to format dates for calendar links
-function formatDateForCalendar(dateStr) {
+// Helper function to format dates for Google Calendar (ISO format, no time zone adjustments)
+function formatDateForGoogle(dateStr) {
     const date = new Date(dateStr);
-    // Ensure the date is in the CST timezone
-    date.setHours(date.getHours() - 6); // Adjust for GMT-6
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Format as YYYYMMDDTHHMMSSZ
-}
-
-// Helper function to format dates for ICS files
-function formatDateForICS(dateStr) {
-    const date = new Date(dateStr);
-    // Ensure the date is in the CST timezone
-    date.setHours(date.getHours() - 6); // Adjust for GMT-6
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Format as YYYYMMDDTHHMMSSZ
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Google Calendar expects UTC format
 }
 
 // Helper function to calculate end time based on duration (in minutes)
@@ -534,5 +494,5 @@ function formatReadableDate(dateStr) {
     // Format the date as "Tue Oct 29 09:00 am"
     return `${dayOfWeek} ${month} ${day} ${hours}:${minutes} ${ampm}`;
 }
- 
+
 }
