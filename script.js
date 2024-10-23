@@ -498,5 +498,38 @@ function calculateEndTime(startDateStr, duration) {
     return startDate;
 }
 
+function formatReadableDate(dateStr) {
+    const date = new Date(dateStr);
+
+    // Get day of the week
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const dayOfWeek = daysOfWeek[date.getDay()];
+
+    // Get month
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = months[date.getMonth()];
+
+    // Get day and time
+    const day = date.getDate();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    let ampm = "am";
+
+    // Convert hours to 12-hour format and set am/pm
+    if (hours >= 12) {
+        ampm = "pm";
+        if (hours > 12) {
+            hours -= 12;
+        }
+    } else if (hours === 0) {
+        hours = 12;
+    }
+
+    // Ensure minutes are in two-digit format
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+
+    // Format the date as "Tue Oct 29 09:00 am"
+    return `${dayOfWeek} ${month} ${day} ${hours}:${minutes} ${ampm}`;
+}
  
 }
