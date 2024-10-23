@@ -399,31 +399,17 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     const formatStartDate = formatReadableDate(startDate);
     const formatEndDate = formatReadableDate(endDate);
 
+    const formattedStartDate1 = formatDateForCalendar(startDate);
+    const formattedEndDate1 = formatDateForCalendar(endDate);
+
     // Google Calendar URL (Use the correctly formatted local time)
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
     
     console.log("googleCalendarUrl= " + googleCalendarUrl);
 
 	  // Create the content for the .ics file
-    const icsContent = `
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Your Organization//Your Product//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-BEGIN:VEVENT
-SUMMARY:Health Care Appointment
-LOCATION:${eventLocation}
-DTSTART:${formatDateForICS(startDate)}
-DTEND:${formatDateForICS(endDate)}
-END:VEVENT
-END:VCALENDAR
-    `.trim();
-
-    // Generate the encoded URI for the .ics file
-    const appleCalendarUrl = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsContent);
-   
-    console.log("ICS URI:", appleCalendarUrl);
+   const appleCalendarUrl = `https://calendar.apple.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate1}/${formattedEndDate1}&location=${encodeURIComponent(eventLocation)}`;
+   console.log("ICS URI:", appleCalendarUrl);
 	
     // Send structured content with two buttons (Google and Apple Calendar)
     var notifyWhenDone = function (err) {
@@ -527,5 +513,10 @@ function formatReadableDate(dateStr) {
 function formatDateForICS(dateStr) {
     const date = new Date(dateStr);
     return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Format as YYYYMMDDTHHMMSS
+}
+function formatDateForCalendar(dateStr) {
+    const date = new Date(dateStr);
+    // Format as YYYYMMDDTHHMMSS (with local time)
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Use 'Z' to denote UTC
 }
 }
