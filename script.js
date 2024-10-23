@@ -404,8 +404,26 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     
     console.log("googleCalendarUrl= " + googleCalendarUrl);
 
-    const icsURI = generateICSURI(startDate, endDate, eventLocation);
-    console.log("ICS URI:", icsURI);
+	  // Create the content for the .ics file
+    const icsContent = `
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Your Organization//Your Product//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+SUMMARY:Health Care Appointment
+LOCATION:${eventLocation}
+DTSTART:${formatDateForICS(startDate)}
+DTEND:${formatDateForICS(endDate)}
+END:VEVENT
+END:VCALENDAR
+    `.trim();
+
+    // Generate the encoded URI for the .ics file
+    const appleCalendarUrl = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsContent);
+   
+    console.log("ICS URI:", appleCalendarUrl);
 	
     // Send structured content with two buttons (Google and Apple Calendar)
     var notifyWhenDone = function (err) {
@@ -440,7 +458,7 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
                     "click": {
                         "actions": [{
                             "type": "link",
-                            "uri": icsURI
+                            "uri": appleCalendarUrl
                         }]
                     }
                 }
@@ -508,36 +526,6 @@ function formatReadableDate(dateStr) {
 }
 function formatDateForICS(dateStr) {
     const date = new Date(dateStr);
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0]; // Format as YYYYMMDDTHHMMSS
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Format as YYYYMMDDTHHMMSS
 }
-
-// Function to create an encoded URI for the ICS file
-function generateICSURI(startDate, endDate, eventLocation) {
-    const icsContent = `
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Your Organization//Your Product//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-BEGIN:VEVENT
-SUMMARY:Health Care Appointment
-LOCATION:${eventLocation}
-DTSTART:${formatDateForICS(startDate)}
-DTEND:${formatDateForICS(endDate)}
-BEGIN:VTIMEZONE
-TZID:Asia/Kolkata
-BEGIN:STANDARD
-TZOFFSETFROM:+0530
-TZOFFSETTO:+0530
-DTSTART:19700101T000000
-END:STANDARD
-END:VTIMEZONE
-END:VEVENT
-END:VCALENDAR
-    `.trim();
-
-    return `data:text/calendar;charset=utf-8,` + encodeURIComponent(icsContent);
-}
-
-
 }
