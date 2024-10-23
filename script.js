@@ -399,7 +399,7 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     const formatStartDate = formatReadableDate(startDate);
     const formatEndDate = formatReadableDate(endDate);
 
-    // Google Calendar URL (No time zone adjustment, let Google handle it)
+    // Google Calendar URL (No time zone adjustment, use local time)
     const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=Health+Care+Appointment&dates=${formattedStartDate}/${formattedEndDate}&location=${encodeURIComponent(eventLocation)}`;
     
     console.log("googleCalendarUrl= " + googleCalendarUrl);
@@ -448,10 +448,11 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     lpTag.agentSDK.command(cmdName, data, notifyWhenDone);
 });
 
-// Helper function to format dates for Google Calendar (ISO format, no time zone adjustments)
+// Helper function to format dates for Google Calendar (local time format, no 'Z' for UTC)
 function formatDateForGoogle(dateStr) {
     const date = new Date(dateStr);
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Google Calendar expects UTC format
+    // Format as YYYYMMDDTHHMMSS (without Z at the end)
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0];
 }
 
 // Helper function to calculate end time based on duration (in minutes)
@@ -494,5 +495,6 @@ function formatReadableDate(dateStr) {
     // Format the date as "Tue Oct 29 09:00 am"
     return `${dayOfWeek} ${month} ${day} ${hours}:${minutes} ${ampm}`;
 }
+
 
 }
