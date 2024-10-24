@@ -112,6 +112,36 @@ if (preferredDateInput) {
 } else {
     alert("Please enter a preferred date.");
 }
+	if (numQuickReplies == "1") {
+            var cmdName = lpTag.agentSDK.cmdNames.writeSC;
+            var quickReply1 = document.getElementById('quickReply1').value;
+            var text1=`Please select Preferrable Time Slot for ${formattedDate}`
+
+            var data = {
+                json:{
+                    "type": "vertical",
+                    "tag": "generic",
+                    "elements": [{
+                        "type": "text",
+                        "text": text1,
+                        "tag": "title"
+                      },
+                      {
+                        "type": "button",
+                        "title": quickReply1,
+                        "click": {
+                          "actions": [
+                            {
+                              "type": "publishText",
+                              "text": `${quickReply1} ${formattedDate}`
+                            }
+                          ]
+                        }
+                      }
+                    ]
+            }};
+           lpTag.agentSDK.command(cmdName, data, notifyWhenDone);
+        }
 
 	    
         if (numQuickReplies == "2") {
@@ -441,7 +471,7 @@ END:VCALENDAR
             "elements": [
                 {
                     "type": "text",
-                    "text": `Your appointment is confirmed on ${formatStartDate} to ${formatEndDate}.`
+                    "text": `Your appointment is confirmed on ${formatStartDate}.`
                 },
                 {
                     "type": "button",
