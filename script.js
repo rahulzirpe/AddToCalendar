@@ -405,8 +405,8 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     console.log("googleCalendarUrl= " + googleCalendarUrl);
 
 // Format the dates for the ICS file
-    const formattedStartDate = formatDateForICS(startDate);
-    const formattedEndDate = formatDateForICS(endDate);
+    const formattedStartDate1 = formatDateForICS(startDate);
+    const formattedEndDate1 = formatDateForICS(endDate);
 
     // Create ICS content
     const icsContent = `
@@ -415,8 +415,8 @@ VERSION:2.0
 BEGIN:VEVENT
 SUMMARY:Health Care Appointment
 LOCATION:${eventLocation}
-DTSTART:${formattedStartDate}
-DTEND:${formattedEndDate}
+DTSTART:${formattedStartDate1}
+DTEND:${formattedEndDate1}
 END:VEVENT
 END:VCALENDAR
     `.trim();
