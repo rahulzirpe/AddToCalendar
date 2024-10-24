@@ -404,29 +404,27 @@ document.getElementById('sendAddToCalendarButton').addEventListener('click', fun
     
     console.log("googleCalendarUrl= " + googleCalendarUrl);
 
-	  // Create the content for the .ics file
-    const formattedStartDate1 = formatDateForICS(startDate);
-    const formattedEndDate1 = formatDateForICS(endDate);
+// Format the dates for the ICS file
+    const formattedStartDate = formatDateForICS(startDate);
+    const formattedEndDate = formatDateForICS(endDate);
 
-    // Create ICS file content
+    // Create ICS content
     const icsContent = `
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Your Organization//Your Product//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
 BEGIN:VEVENT
 SUMMARY:Health Care Appointment
 LOCATION:${eventLocation}
-DTSTART:${formattedStartDate1}
-DTEND:${formattedEndDate1}
+DTSTART:${formattedStartDate}
+DTEND:${formattedEndDate}
 END:VEVENT
 END:VCALENDAR
     `.trim();
 
-    // Create a downloadable link for the ICS file using encoded URI
-    const encodedUri = `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`;
-    console.log("ICS URI:", encodedUri);
+    // Encode the ICS content to create a data URI
+    const encodedUri = encodeURI('data:text/calendar;charset=utf-8,' + icsContent);
+    console.log("EncodedURL="+encodedUri);
+	
 	
     // Send structured content with two buttons (Google and Apple Calendar)
     var notifyWhenDone = function (err) {
@@ -527,13 +525,12 @@ function formatReadableDate(dateStr) {
     // Format the date as "Tue Oct 29 09:00 am"
     return `${dayOfWeek} ${month} ${day} ${hours}:${minutes} ${ampm}`;
 }
+// function formatDateForICS(dateStr) {
+//     const date = new Date(dateStr);
+//     return date.toISOString().replace(/[-:]/g, '').split('.')[0]; // Format as YYYYMMDDTHHMMSS
+// }
 function formatDateForICS(dateStr) {
     const date = new Date(dateStr);
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0]; // Format as YYYYMMDDTHHMMSS
-}
-/*function formatDateForCalendar(dateStr) {
-    const date = new Date(dateStr);
-    // Format as YYYYMMDDTHHMMSS (with local time)
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Use 'Z' to denote UTC
-}*/
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Ensure proper format with Z for UTC
+} 
 }
