@@ -459,7 +459,9 @@ END:VCALENDAR
     // Encode the ICS content to create a data URI
     const encodedUri = encodeURI('data:text/calendar;charset=utf-8,' + icsContent);
     console.log("EncodedURL="+encodedUri);
-	
+
+    const appleCalendarUrl = `webcal://calendar.apple.com/add?event=Health%20Care%20Appointment&location=${encodeURIComponent(eventLocation)}&start=${formattedStartDate1}&end=${formattedEndDate1}`;
+    console.log("appleCalendarUrl="+appleCalendarUrl);
 	
     // Send structured content with two buttons (Google and Apple Calendar)
     var notifyWhenDone = function (err) {
@@ -494,7 +496,7 @@ END:VCALENDAR
                     "click": {
                         "actions": [{
                             "type": "link",
-                            "uri": encodedUri
+                            "uri": appleCalendarUrl
                         }]
                     }
                 }
