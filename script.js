@@ -40,7 +40,7 @@ document.getElementById('generateButton').addEventListener('click', function () 
         quickRepliesContainer.appendChild(label);
 
         const input = document.createElement('input');
-	const input = document.createElement('input');
+	//const input = document.createElement('input');
         input.type = 'time';
         input.id = `quickReply${i}`;
         quickRepliesContainer.appendChild(input);
