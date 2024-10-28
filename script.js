@@ -40,10 +40,15 @@ document.getElementById('generateButton').addEventListener('click', function () 
         quickRepliesContainer.appendChild(label);
 
         const input = document.createElement('input');
-        input.type = 'text';
+	const input = document.createElement('input');
+        input.type = 'time';
         input.id = `quickReply${i}`;
-        input.placeholder = `Enter Option ${i}`;
         quickRepliesContainer.appendChild(input);
+	    
+        // input.type = 'text';
+        // input.id = `quickReply${i}`;
+        // input.placeholder = `Enter Option ${i}`;
+        // quickRepliesContainer.appendChild(input);
     }
 	
     document.getElementById('sendButton').style.display = 'block';
